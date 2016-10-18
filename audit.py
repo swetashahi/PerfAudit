@@ -43,7 +43,7 @@ def scan_page_source(url):
 			number_of_empty_title=number_of_empty_title+1
 			
 	print "Number of <a> tags without titles is %d" % number_of_empty_title
-	write_to_html(url, "Number of <a> tags without titles is", number_of_empty_title)
+	write_to_html(url, "Number of a tags without titles is", number_of_empty_title)
 
 	# Find link tags with no titles
 	number_of_empty_title=0
@@ -54,7 +54,7 @@ def scan_page_source(url):
 			number_of_empty_title=number_of_empty_title+1
 			
 	print "Number of <link> tags without titles is %d" % number_of_empty_title	
-	write_to_html(url, "Number of <link> tags without titles is ", number_of_empty_title)
+	write_to_html(url, "Number of link tags without titles is ", number_of_empty_title)
 
 	# Find the w3c errors and warnings
 
@@ -72,7 +72,7 @@ def scan_page_source(url):
 	index=0
 	for item in response_soup.find_all('li', class_="error"):
 		index=index+1
-		error=cleanhtml(str(item.span))
+		error=cleanhtml(str(item))
 		#print error
 		print "Error # %d is: %s" % (index, error)
 		write_to_html(url, "W3C Error ", error)
@@ -83,7 +83,7 @@ def scan_page_source(url):
 			print "no warning"
 			break
 		else:
-			warning=cleanhtml(str(item.span))
+			warning=cleanhtml(str(item))
 			print "Warning # %d is: %s" % (index, warning)
 			write_to_html(url, "W3C Warning ", warning)
 	
@@ -103,7 +103,7 @@ def scan_page_source(url):
 	#print "the page speed score is ", page_speed_data["SPEED"]
 	
 
-	
+
 def create_html_report():
 	outfile = open("output.html", "w")
 	print >>outfile, """<html>
