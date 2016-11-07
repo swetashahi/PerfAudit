@@ -23,30 +23,30 @@ def scan_page_source(url):
 	response=requests.get(url)
 	data=response.text
 	soup = BeautifulSoup(data, "html.parser")
-	
+
 	#find all img tags
 	number_img_tag=len(soup.find_all("img"))
 	print number_img_tag
 
 	#Find all img tags with blank alt atributes
 	number_of_empty_alt=0
-	
+
 	for tag in soup.find_all("img"):
 		alt_tag=tag.get('alt', '')
 		#print alt_tag
 		if not alt_tag:
 			number_of_empty_alt=number_of_empty_alt+1
-	print "Number of empty alt tags is %d" % number_of_empty_alt	 
+	print "Number of empty alt tags is %d" % number_of_empty_alt
 	write_to_html("Number of empty alt tags", number_of_empty_alt)
-	
+
 	# Find links without titles
 	number_of_empty_title=0
 	for link in soup.find_all("a"):
 		title_of_link=link.get('title', '')
-		
+
 		if "title" not in title_of_link:
 			number_of_empty_title=number_of_empty_title+1
-			
+
 	print "Number of <a> tags without titles is %d" % number_of_empty_title
 	write_to_html("Number of a tags without titles is", number_of_empty_title)
 
@@ -54,11 +54,11 @@ def scan_page_source(url):
 	number_of_empty_title=0
 	for link_tag in soup.find_all("link"):
 		title_of_link=link.get('title', '')
-		
+
 		if "title" not in title_of_link:
 			number_of_empty_title=number_of_empty_title+1
-			
-	print "Number of <link> tags without titles is %d" % number_of_empty_title	
+
+	print "Number of <link> tags without titles is %d" % number_of_empty_title
 	write_to_html("Number of link tags without titles is ", number_of_empty_title)
 
 	# Find the w3c errors and warnings
@@ -68,7 +68,7 @@ def scan_page_source(url):
 	SITE_URL = url
 	request = URL+SITE_URL
 	print request
-	
+
 	w3c_response = requests.get(request)
 	response_data=w3c_response.text
 
@@ -91,7 +91,7 @@ def scan_page_source(url):
 			warning=cleanhtml(str(item))
 			print "Warning # %d is: %s" % (index, warning)
 			write_to_html("W3C Warning ", warning)
-	
+
 	# Find the inline css js
 	script_tag = soup.find_all('script')
 	if len(script_tag) > 0:
@@ -108,9 +108,9 @@ def scan_page_source(url):
 	count=0
 	pattern=r"<!--(.*?)-->"
 	#matches=pattern.match(data)
-	
+
 	matches = re.findall(pattern, data)
-	
+
 	#matches = re.finditer(pattern, data)
 	for match in matches:
 		if ("IE" not in match):
@@ -121,7 +121,7 @@ def scan_page_source(url):
 
 
 	#FIND console errors
-	
+
 	driver = webdriver.PhantomJS()
 	driver.get(url)
 	i=1
@@ -136,9 +136,9 @@ def scan_page_source(url):
 	count=0
 	pattern=r"<(.*?)tabindex(.*?)>"
 	#matches=pattern.match(data)
-	
+
 	matches = re.findall(pattern, data)
-	
+
 	#matches = re.finditer(pattern, data)
 	for match in matches:
 		count=count+1
@@ -151,7 +151,7 @@ def scan_page_source(url):
 	pattern = r"/<[^\/>][^>]*><\/[^>]+>/"
 	#pattern=r"document"
 	matches = re.findall(pattern, data)
-	
+
 	#matches = re.finditer(pattern, data)
 	for match in matches:
 		count=count+1
@@ -185,7 +185,7 @@ def scan_page_source(url):
 	else:
 		int_found = 0
 		print "No external stylesheets found"
-	
+
 
 
 	#TO-DO Find Pagespeed Ranking
@@ -195,7 +195,7 @@ def scan_page_source(url):
 	#page_speed_data=json.loads(page_speed_response.text)
 	#page_speed_data=page_speed_response.json()
 	#print "the page speed score is ", page_speed_data["SPEED"]
-	
+
 
 
 def create_html_report(url=None):
@@ -211,31 +211,51 @@ def create_html_report(url=None):
 	else:
 		outfile = open("output.html", "w")
 		print >>outfile, """<html>
-			<head>
- 			<title>Front End Audit Report </title>
-			</head>
-			<body>
+			<!DOCTYPE html>
+<html lang = "en">
+
+   <head>
+      <meta charset = "utf-8">
+      <meta http-equiv = "X-UA-Compatible" content = "IE = edge">
+      <meta name = "viewport" content = "width = device-width, initial-scale = 1">
+
+      <title>Frontend audit report</title>
+
+      <!-- Bootstrap -->
+      <link href = "//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" rel = "stylesheet">
+
+      <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+      <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+
+      <!--[if lt IE 9]>
+      <script src = "https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src = "https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+      <![endif]-->
+
+   </head>
+
+   <body>
 			<p><h1>Audit results  for {url}</h1>
-			<table border="1">""".format(url=url)
+			<table class = "table">""".format(url=url)
 		print >>outfile, "<th>Check for</th><th>Result</th></tr>"
 
 
 def write_to_html(check, result, url=None):
 	if url is None:
 		outfile=open("output.html", "a")
-		print >>outfile, "<tr><td>"+check+"</td><td>"+str(result)+"</td></tr>"
+		print >>outfile, "<tr class = 'danger'><td>"+check+"</td><td>"+str(result)+"</td></tr>"
 
 
 
 
 def read_csv(filename):
-	
+
 	row_count = len(open(filename).readlines())
 	print "Number of URLs to scan are ", row_count
 	if row_count < 1 or row_count > 10:
 		print "empty or too large file"
 		die
-	
+
 	index=0
 	url_list =[]
 
@@ -244,7 +264,7 @@ def read_csv(filename):
 	    url_list.append(str(csv_row))
 
 	print str(url_list[0])
-	    
+
 	while index <row_count:
 		print "Url %d  to consider for audit is: %s" % (index, url_list[index])
 		scan_page_source(url_list[index].replace("'", "").replace("[", "").replace("]", ""))
@@ -268,9 +288,9 @@ try:
 	else:
 		read_csv(filename)
 
-	
 
-	
+
+
 
 except Exception, e:
 	print "Failed to read csv file: %s" % e
